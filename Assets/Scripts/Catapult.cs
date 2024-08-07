@@ -1,25 +1,63 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Catapult : MonoBehaviour
 {
-    [SerializeField] private float _impulseForce;
+    public int maxSpring;
+    public Transform spoon;
+    public SpringJoint joint;
+    public Vector3 resetPosition;
+    public Rigidbody projectilePrefab;
+    public Transform projectileSpawnPosition;
 
-    private Rigidbody _spoonRigidBody;
+    private bool _isRestart = false;
+    private bool _isLaunch = false;
 
     private void Awake()
     {
-        _spoonRigidBody = GetComponent<Rigidbody>();
+        resetPosition = transform.position;
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && _isRestart == false)
         {
-            Debug.Log("Space pressed");
+            LaunchCatapult();
+        }
 
-            
+        if (Input.GetKeyDown(KeyCode.R) && _isRestart == false)
+        {
+            ResetCatapult();
+        }
+    }
+
+    private void ResetCatapult()
+    {
+        joint.spring = 0;
+
+        StartCoroutine(Reset());
+    }
+
+    private void LaunchCatapult()
+    {
+        joint.spring = maxSpring;
+    }
+
+    private IEnumerator Reset()
+    {
+        _isRestart = true;
+        bool isWork = true;
+
+        while (isWork)
+        {
+            if (spoon.transform.position != resetPosition)
+            {
+                isWork = false;
+                Instantiate(projectilePrefab, projectileSpawnPosition.position, projectileSpawnPosition.rotation);
+                _isRestart = false;
+            }
+
+            yield return null;
         }
     }
 }
