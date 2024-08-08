@@ -5,6 +5,7 @@ public class Swing : MonoBehaviour
 {
     [SerializeField] private float _swingForce;
     [SerializeField] private GameObject _directionObject;
+    [SerializeField] private KeyCode _swingKey;
 
     private Rigidbody _cubeRigidBody;
 
@@ -15,7 +16,7 @@ public class Swing : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(_swingKey))
         {
             Debug.Log("Space pressed");
 

@@ -1,63 +1,44 @@
-using System.Collections;
 using UnityEngine;
 
 public class Catapult : MonoBehaviour
 {
-    public int maxSpring;
-    public Transform spoon;
-    public SpringJoint joint;
-    public Vector3 resetPosition;
-    public Rigidbody projectilePrefab;
-    public Transform projectileSpawnPosition;
-
-    private bool _isRestart = false;
-    private bool _isLaunch = false;
-
-    private void Awake()
-    {
-        resetPosition = transform.position;
-    }
+    [SerializeField] private int _maxSpringValue;
+    [SerializeField] private Rigidbody _spoon;
+    [SerializeField] private SpringJoint _joint;
+    [SerializeField] private Transform _spawnPoint;
+    [SerializeField] private Collider _reloadCollider;
+    [SerializeField] private GameObject _cubePrefab;
+    [SerializeField] private KeyCode _launchKey;
+    [SerializeField] private KeyCode _resetKey;
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && _isRestart == false)
+        if (Input.GetKeyDown(_launchKey))
         {
-            LaunchCatapult();
+            Launch();
         }
 
-        if (Input.GetKeyDown(KeyCode.R) && _isRestart == false)
+        if (Input.GetKeyDown(_resetKey))
         {
-            ResetCatapult();
+            Reset();
         }
     }
 
-    private void ResetCatapult()
+    private void OnTriggerEnter(Collider other)
     {
-        joint.spring = 0;
-
-        StartCoroutine(Reset());
+        if (other == _reloadCollider)
+            Instantiate(_cubePrefab, _spawnPoint.transform.position, Quaternion.identity);
     }
 
-    private void LaunchCatapult()
+    private void Launch()
     {
-        joint.spring = maxSpring;
+        _spoon.AddForce(Vector3.up * 0.1f, ForceMode.Impulse);
+        _joint.spring = _maxSpringValue;
     }
 
-    private IEnumerator Reset()
+    private void Reset()
     {
-        _isRestart = true;
-        bool isWork = true;
-
-        while (isWork)
-        {
-            if (spoon.transform.position != resetPosition)
-            {
-                isWork = false;
-                Instantiate(projectilePrefab, projectileSpawnPosition.position, projectileSpawnPosition.rotation);
-                _isRestart = false;
-            }
-
-            yield return null;
-        }
+        _spoon.AddForce(Vector3.down * 0.1f, ForceMode.Impulse);
+        _joint.spring = 0;
     }
 }
